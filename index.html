@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusURP - A Centralized University Resource Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background: #f4f6fc;
+      color: #333;
+      line-height: 1.6;
+    }
+    header {
+      background-color: #4F46E5;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      animation: fadeInDown 1s ease-out;
+    }
+    header h1 {
+      font-size: 2.5rem;
+    }
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    nav {
+      background: #4338ca;
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .nav-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+    }
+    nav a:hover {
+      background-color: rgba(255,255,255,0.1);
+      color: #e0e7ff;
+    }
+    nav a.active {
+      background-color: rgba(255,255,255,0.2);
+    }
+    .container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .section-heading {
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #4F46E5;
+      display: flex;
+      align-items: center;
+    }
+    .section-heading h2 {
+      margin-right: auto;
+    }
+    .interactive-section {
+      margin-top: 2rem;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .interactive-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input, button, select, textarea {
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 1rem;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    }
+    input.error, textarea.error, select.error {
+      border-color: #ef4444;
+      background-color: rgba(239, 68, 68, 0.05);
+    }
+    .error-message {
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    button {
+      background-color: #4F46E5;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    button:hover {
+      background-color: #3730a3;
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    .confirmation {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 5px;
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      display: none;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .dept-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .dept-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .dept-card h3 {
+      color: #4F46E5;
+      margin-bottom: 0.5rem;
+    }
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .form-col {
+      flex: 1;
+    }
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4F46E5;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-left: 10px;
+      vertical-align: middle;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tabbed-content {
+      margin-top: 1.5rem;
+    }
+    .tab-buttons {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 1rem;
+    }
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: #666;
+      width: auto;
+    }
+    .tab-btn.active {
+      border-bottom: 2px solid #4F46E5;
+      color: #4F46E5;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #e0e7ff;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+    }
+    .footer-content {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .social-links {
+      display: flex;
+      gap: 1rem;
+    }
+    .social-links a {
+      color: #4338ca;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .scroll-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4F46E5;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      font-size: 1.5rem;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .scroll-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      .nav-container {
+        flex-direction: column;
+      }
+      nav a {
+        margin: 0.25rem 0;
+      }
+      .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CampusURP</h1>
+    <p>Your Interactive University Resource Portal</p>
+  </header>
+
+  <nav>
+    <div class="nav-container">
+      <a onclick="scrollToSection('directory')" id="nav-directory">Department Directory</a>
+      <a onclick="scrollToSection('booking')" id="nav-booking">Study Room Booking</a>
+      <a onclick="scrollToSection('events')" id="nav-events">Campus Events</a>
+      <a onclick="scrollToSection('contact')" id="nav-contact">Contact Us</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <section id="directory" class="interactive-section">
+      <div class="section-heading">
+        <h2>Department Directory</h2>
+      </div>
+      <p>Browse our university departments to find contact information, office hours, and services.</p>
+      
+      <div class="card-grid">
+        <div class="dept-card" onclick="showDepartmentInfo('Computer Science')">
+          <h3>Computer Science</h3>
+          <p>Building: Tech Center</p>
+        </div>
+        <div class="dept-card" onclick="showDepartmentInfo('Engineering')">
+          <h3>Engineering</h3>
+          <p>Building: Innovation Hub</p>
+        </div>
+        <div class="dept-card" onclick="showDepartmentInfo('Business')">
+          <h3>Business</h3>
+          <p>Building: Commerce Hall</p>
+        </div>
+        <div class="dept-card" onclick="showDepartmentInfo('Arts & Humanities')">
+          <h3>Arts & Humanities</h3>
+          <p>Building: Creative Commons</p>
+        </div>
+      </div>
+      
+      <div id="departmentInfo" class="confirmation"></div>
+    </section>
+
+    <section id="booking" class="interactive-section">
+      <div class="section-heading">
+        <h2>Book a Study Room</h2>
+        <span class="loader" id="bookingLoader"></span>
+      </div>
+      <p>Reserve a quiet study space for your individual or group study sessions.</p>
+      
+      <div class="tabbed-content">
+        <div class="tab-buttons">
+          <button class="tab-btn active" onclick="openTab('individualBooking')">Individual Room</button>
+          <button class="tab-btn" onclick="openTab('groupBooking')">Group Room</button>
+        </div>
+        
+        <div id="individualBooking" class="tab-content active">
+          <form id="bookingForm" onsubmit="return bookRoom(event)">
+            <div class="form-row">
+              <div class="form-col">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Your Name" />
+                <div class="error-message" id="name-error">Please enter your name</div>
+              </div>
+              <div class="form-col">
+                <label for="studentId">Student ID</label>
+                <input type="text" id="studentId" placeholder="Your Student ID" />
+                <div class="error-message" id="studentId-error">Please enter your Student ID</div>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-col">
+                <label for="date">Date</label>
+                <input type="date" id="date" />
+                <div class="error-message" id="date-error">Please select a date</div>
+              </div>
+              <div class="form-col">
+                <label for="time">Time</label>
+                <input type="time" id="time" />
+                <div class="error-message" id="time-error">Please select a time</div>
+              </div>
+              <div class="form-col">
+                <label for="duration">Duration (hours)</label>
+                <select id="duration">
+                  <option value="1">1 hour</option>
+                  <option value="2">2 hours</option>
+                  <option value="3">3 hours</option>
+                </select>
+              </div>
+            </div>
+            
+            <button type="submit">Book Room</button>
+          </form>
+        </div>
+        
+        <div id="groupBooking" class="tab-content">
+          <form id="groupBookingForm" onsubmit="return bookGroupRoom(event)">
+            <div class="form-row">
+              <div class="form-col">
+                <label for="groupName">Group Name</label>
+                <input type="text" id="groupName" placeholder="Your Group Name" />
+                <div class="error-message" id="groupName-error">Please enter your group name</div>
+              </div>
+              <div class="form-col">
+                <label for="groupSize">Group Size</label>
+                <select id="groupSize">
+                  <option value="2-4">2-4 people</option>
+                  <option value="5-8">5-8 people</option>
+                  <option value="9-12">9-12 people</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-col">
+                <label for="groupDate">Date</label>
+                <input type="date" id="groupDate" />
+                <div class="error-message" id="groupDate-error">Please select a date</div>
+              </div>
+              <div class="form-col">
+                <label for="groupTime">Time</label>
+                <input type="time" id="groupTime" />
+                <div class="error-message" id="groupTime-error">Please select a time</div>
+              </div>
+              <div class="form-col">
+                <label for="groupDuration">Duration (hours)</label>
+                <select id="groupDuration">
+                  <option value="1">1 hour</option>
+                  <option value="2">2 hours</option>
+                  <option value="3">3 hours</option>
+                </select>
+              </div>
+            </div>
+            
+            <button type="submit">Book Group Room</button>
+          </form>
+        </div>
+      </div>
+      
+      <div id="bookingConfirmation" class="confirmation"></div>
+    </section>
+    
+    <section id="events" class="interactive-section">
+      <div class="section-heading">
+        <h2>Campus Events</h2>
+      </div>
+      <p>Stay updated with the latest happenings around campus.</p>
+      
+      <div class="card-grid">
+        <div class="dept-card">
+          <h3>Spring Career Fair</h3>
+          <p>Date: April 15, 2025</p>
+          <p>Location: AUS Sports Complex, Gymnasium A</p>
+          <p>Connect with potential employers and explore internship opportunities.</p>
+        </div>
+        <div class="dept-card">
+          <h3>Tech Symposium</h3>
+          <p>Date: April 22, 2025</p>
+          <p>Location: AUS Main Building</p>
+          <p>Join industry experts for discussions on emerging technologies.</p>
+        </div>
+        <div class="dept-card">
+          <h3>Arts Festival</h3>
+          <p>Date: May 5-7, 2025</p>
+          <p>Location: Arts Building Rotunda</p>
+          <p>Celebrate creativity with exhibitions, performances, and workshops.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="interactive-section">
+      <div class="section-heading">
+        <h2>Contact Us</h2>
+        <span class="loader" id="contactLoader"></span>
+      </div>
+      <p>Have questions or feedback? We'd love to hear from you!</p>
+      
+      <form id="contactForm" onsubmit="return sendMessage(event)">
+        <div class="form-row">
+          <div class="form-col">
+            <label for="contactName">Name</label>
+            <input type="text" id="contactName" placeholder="Your Name" />
+            <div class="error-message" id="contactName-error">Please enter your name</div>
+          </div>
+          <div class="form-col">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Your Email" />
+            <div class="error-message" id="email-error">Please enter a valid email address</div>
+          </div>
+        </div>
+        
+        <label for="subject">Subject</label>
+        <select id="subject">
+          <option value="">-- Select a Subject --</option>
+          <option value="General Inquiry">General Inquiry</option>
+          <option value="Technical Support">Technical Support</option>
+          <option value="Feedback">Feedback</option>
+          <option value="Other">Other</option>
+        </select>
+        <div class="error-message" id="subject-error">Please select a subject</div>
+        
+        <label for="message">Message</label>
+        <textarea id="message" placeholder="Your Message" rows="5"></textarea>
+        <div class="error-message" id="message-error">Please enter your message</div>
+        
+        <button type="submit">Send Message</button>
+      </form>
+      
+      <div id="contactConfirmation" class="confirmation"></div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div>
+        &copy; 2025 CampusURP. Built with ❤️ by Obaid & Ahmed.
+      </div>
+      <div class="social-links">
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+        <a href="#">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+  
+  <a href="#" class="scroll-to-top" id="scrollToTop">↑</a>
+
+  <script>
+    // Navigation and scrolling
+    function scrollToSection(sectionId) {
+      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+      updateActiveNav(sectionId);
+    }
+    
+    function updateActiveNav(sectionId) {
+      const navLinks = document.querySelectorAll('nav a');
+      navLinks.forEach(link => link.classList.remove('active'));
+      document.getElementById(`nav-${sectionId}`).classList.add('active');
+    }
+    
+    // Handle scroll to top button visibility
+    window.addEventListener('scroll', function() {
+      const scrollToTopButton = document.getElementById('scrollToTop');
+      if (window.pageYOffset > 300) {
+        scrollToTopButton.classList.add('visible');
+      } else {
+        scrollToTopButton.classList.remove('visible');
+      }
+    });
+    
+    document.getElementById('scrollToTop').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    // Department info data
+    const departmentInfo = {
+      "Computer Science": {
+        contact: "cs-dept@campus.edu",
+        phone: "(555) 123-4567",
+        hours: "9am - 5pm",
+        location: "ESB Building, 2nd Floor",
+        services: ["Academic Advising", "Lab Access", "Technical Support"]
+      },
+      "Engineering": {
+        contact: "engineering@campus.edu",
+        phone: "(555) 234-5678",
+        hours: "8am - 4pm",
+        location: "ESB Building, 2nd Floor",
+        services: ["Project Spaces", "Equipment Rental", "Industry Partnerships"]
+      },
+      "Business": {
+        contact: "business@campus.edu",
+        phone: "(555) 345-6789",
+        hours: "10am - 6pm",
+        location: "SBA Building, 2nd floor",
+        services: ["Career Counseling", "Internship Placement", "Entrepreneurship Center"]
+      },
+      "Arts": {
+        contact: "arts-humanities@campus.edu",
+        phone: "(555) 456-7890",
+        hours: "9am - 4pm",
+        location: "Arts Building, 2nd Floor",
+        services: ["Gallery Space", "Performance Venues", "Writing Center"]
+      }
+    };
+
+    // Show department information
+    function showDepartmentInfo(department) {
+      const info = departmentInfo[department];
+      const infoBox = document.getElementById('departmentInfo');
+      
+      if (info) {
+        let servicesHTML = '';
+        info.services.forEach(service => {
+          servicesHTML += `<li>${service}</li>`;
+        });
+        
+        infoBox.innerHTML = `
+          <h3>${department} Department</h3>
+          <p><strong>Email:</strong> ${info.contact}</p>
+          <p><strong>Phone:</strong> ${info.phone}</p>
+          <p><strong>Office Hours:</strong> ${info.hours}</p>
+          <p><strong>Location:</strong> ${info.location}</p>
+          <p><strong>Services:</strong></p>
+          <ul>${servicesHTML}</ul>
+        `;
+        infoBox.style.display = 'block';
+        
+        // Scroll to info
+        setTimeout(() => {
+          infoBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+
+    // Tab functionality
+    function openTab(tabId) {
+      const tabContents = document.querySelectorAll('.tab-content');
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      
+      tabContents.forEach(tab => tab.classList.remove('active'));
+      tabButtons.forEach(button => button.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // Validation functions
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+    
+    function validateForm(formData) {
+      let isValid = true;
+      
+      for (const [field, value] of formData.entries()) {
+        const errorElement = document.getElementById(`${field}-error`);
+        if (errorElement) {
+          if (!value) {
+            document.getElementById(field).classList.add('error');
+            errorElement.style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById(field).classList.remove('error');
+            errorElement.style.display = 'none';
+          }
+        }
+      }
+      
+      // Special validation for email
+      if (formData.has('email')) {
+        const email = formData.get('email');
+        if (email && !validateEmail(email)) {
+          document.getElementById('email').classList.add('error');
+          document.getElementById('email-error').style.display = 'block';
+          isValid = false;
+        }
+      }
+      
+      return isValid;
+    }
+
+    // Book a room
+    function bookRoom(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(document.getElementById('bookingForm'));
+      const loader = document.getElementById('bookingLoader');
+      const confirmation = document.getElementById('bookingConfirmation');
+      
+      if (!validateForm(formData)) {
+        return false;
+      }
+      
+      // Show loading indicator
+      loader.style.display = 'inline-block';
+      
+      // Simulate API call
+      setTimeout(() => {
+        loader.style.display = 'none';
+        
+        const name = formData.get('name');
+        const date = formData.get('date');
+        const time = formData.get('time');
+        const duration = formData.get('duration');
+        
+        confirmation.innerHTML = `
+          <h3>Booking Confirmed!</h3>
+          <p>Thank you, ${name}! Your individual study room has been booked.</p>
+          <p><strong>Date:</strong> ${formatDate(date)}</p>
+          <p><strong>Time:</strong> ${formatTime(time)}</p>
+          <p><strong>Duration:</strong> ${duration} hour(s)</p>
+          <p><strong>Booking ID:</strong> ${generateBookingId()}</p>
+        `;
+        confirmation.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('bookingForm').reset();
+        
+        // Scroll to confirmation
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 1500);
+      
+      return false;
+    }
+    
+    // Book a group room
+    function bookGroupRoom(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(document.getElementById('groupBookingForm'));
+      const loader = document.getElementById('bookingLoader');
+      const confirmation = document.getElementById('bookingConfirmation');
+      
+      if (!validateForm(formData)) {
+        return false;
+      }
+      
+      // Show loading indicator
+      loader.style.display = 'inline-block';
+      
+      // Simulate API call
+      setTimeout(() => {
+        loader.style.display = 'none';
+        
+        const groupName = formData.get('groupName');
+        const groupSize = formData.get('groupSize');
+        const date = formData.get('groupDate');
+        const time = formData.get('groupTime');
+        const duration = formData.get('groupDuration');
+        
+        confirmation.innerHTML = `
+          <h3>Group Booking Confirmed!</h3>
+          <p>Thank you! A group study room has been booked for '${groupName}'.</p>
+          <p><strong>Group Size:</strong> ${groupSize}</p>
+          <p><strong>Date:</strong> ${formatDate(date)}</p>
+          <p><strong>Time:</strong> ${formatTime(time)}</p>
+          <p><strong>Duration:</strong> ${duration} hour(s)</p>
+          <p><strong>Booking ID:</strong> ${generateBookingId()}</p>
+        `;
+        confirmation.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('groupBookingForm').reset();
+        
+        // Scroll to confirmation
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 1500);
+      
+      return false;
+    }
+
+    // Send contact message
+    function sendMessage(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(document.getElementById('contactForm'));
+      const loader = document.getElementById('contactLoader');
+      const confirmation = document.getElementById('contactConfirmation');
+      
+      if (!validateForm(formData)) {
+        return false;
+      }
+      
+      // Show loading indicator
+      loader.style.display = 'inline-block';
+      
+      // Simulate API call
+      setTimeout(() => {
+        loader.style.display = 'none';
+        
+        const name = formData.get('contactName');
+        
+        confirmation.innerHTML = `
+          <h3>Message Sent Successfully!</h3>
+          <p>Thank you, ${name}! Your message has been received.</p>
+          <p>We'll get back to you shortly at ${formData.get('email')}.</p>
+          <p><strong>Reference Number:</strong> ${generateReferenceId()}</p>
+        `;
+        confirmation.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('contactForm').reset();
+        
+        // Scroll to confirmation
+        confirmation.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 1500);
+      
+      return false;
+    }
+
+    // Helper functions
+    function formatDate(dateString) {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+    
+    function formatTime(timeString) {
+      const [hours, minutes] = timeString.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    }
+    
+    function generateBookingId() {
+      return 'BK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
+    
+    function generateReferenceId() {
+      return 'REF-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
+
+    // Initialize date inputs to today
+    const currentDate = new Date().toISOString().split('T')[0];
+    document.getElementById('date').min = currentDate;
+    document.getElementById('date').value = currentDate;
+    document.getElementById('groupDate').min = currentDate;
+    document.getElementById('groupDate').value = currentDate;
+    
+    // Set initial active nav
+    window.addEventListener('DOMContentLoaded', function() {
+      const sections = document.querySelectorAll('section');
+      sections.forEach(section => {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              updateActiveNav(entry.target.id);
+            }
+          });
+        }, { threshold: 0.6 });
+        observer.observe(section);
+      });
+    });
+  </script>
+</body>
+</html>
